@@ -1,0 +1,35 @@
+.summary .score {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 12px 0 18px;
+}
+
+.summary .score-number {
+  font-size: 48px;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.summary .score-details {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  color: var(--color-muted);
+}
+
+.summary .percent {
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.summary .label {
+  font-size: 12px;
+  color: var(--color-muted-soft);
+  margin-right: 4px;
+}
+
+.summary .note {
+  color: var(--color-muted);
+  font-size: 14px;
+}

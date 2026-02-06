@@ -1,0 +1,32 @@
+{
+  "name": "gh300-quiz",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "biome check .",
+    "preview": "vite preview",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "yaml": "^2.8.2"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@testing-library/jest-dom": "^6.4.0",
+    "@testing-library/react": "^16.0.1",
+    "@testing-library/user-event": "^14.6.0",
+    "@types/node": "^24.10.1",
+    "@types/react": "^19.2.5",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "jsdom": "^25.0.1",
+    "typescript": "~5.9.3",
+    "vite": "^7.2.4",
+    "vitest": "^2.1.5"
+  }
+}
