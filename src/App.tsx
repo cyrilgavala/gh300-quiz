@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useState } from 'react'
+import {useEffect, useMemo, useState} from 'react'
 import './App.css'
 import useQuestions from './hooks/useQuestions'
 import Review from './components/Review'
 import Summary from './components/Summary'
 import Card from './components/Card'
+import {saveAttempt} from './storage/attempts'
+import type {Attempt} from './types'
 
 type ViewMode = 'quiz' | 'summary' | 'review'
 
@@ -16,6 +18,7 @@ const App = () => {
   const [answers, setAnswers] = useState<Record<number, Set<string>>>({})
   const [currentIndex, setCurrentIndex] = useState(0)
   const [view, setView] = useState<ViewMode>('quiz')
+  const [startedAt, setStartedAt] = useState(() => new Date().toISOString())
 
   const currentQuestion = questions[currentIndex]
   const isMultiSelect = currentQuestion?.correctAnswers?.length > 1
@@ -67,6 +70,14 @@ const App = () => {
   }, [goNext, goPrev, view])
 
   const finishQuiz = () => {
+    const percent = score.total === 0 ? 0 : Math.round((score.correct / score.total) * 100)
+    const attempt: Attempt = {
+      attemptId: (globalThis.crypto?.randomUUID?.() ?? Math.random().toString(36).slice(2)),
+      startedAt,
+      completedAt: new Date().toISOString(),
+      score: {...score, percent},
+    }
+    saveAttempt(attempt)
     setView('summary')
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -75,6 +86,7 @@ const App = () => {
     setAnswers({})
     setCurrentIndex(0)
     setView('quiz')
+    setStartedAt(new Date().toISOString())
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 

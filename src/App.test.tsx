@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import App from './App'
 
@@ -30,6 +30,10 @@ describe('App', () => {
     window.scrollTo = vi.fn()
   })
 
+  beforeEach(() => {
+    localStorage.clear()
+  })
+
   it('walks through the wizard and shows summary score', async () => {
     const user = userEvent.setup()
     render(<App />)
@@ -49,5 +53,23 @@ describe('App', () => {
     expect(screen.getByText('out of')).toBeInTheDocument()
     expect(screen.getByText('2')).toBeInTheDocument()
     expect(screen.getByText('50%')).toBeInTheDocument()
+  })
+
+  it('saves an attempt after finishing the quiz', async () => {
+    const user = userEvent.setup()
+    render(<App/>)
+
+    await user.click(screen.getByLabelText(/No/))
+    await user.click(screen.getByRole('button', {name: /next/i}))
+    await user.click(screen.getByLabelText(/Right/))
+    await user.click(screen.getByRole('button', {name: /finish/i}))
+
+    const stored = JSON.parse(localStorage.getItem('gh300-attempts') ?? '[]') as Array<any>
+    expect(stored).toHaveLength(1)
+    const attempt = stored[0]
+    expect(attempt.attemptId).toBeTruthy()
+    expect(attempt.score.correct).toBe(1)
+    expect(attempt.score.total).toBe(2)
+    expect(attempt.score.percent).toBe(50)
   })
 })
