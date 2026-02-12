@@ -8,6 +8,8 @@ A React 19 + Vite single-page app that steps through the provided `GH300-questio
 - Final score summary and percentage
 - Review mode that highlights correct answers, your selections, and explanations
 - Questions sourced directly from `public/GH300-questions.yaml`
+- Disclaimer gate before starting: content is web-scraped public material for personal GH300 prep;
+  rights remain with Microsoft and GitHub
 
 ## Getting started
 Install dependencies (Node 20.19+ recommended to satisfy Vite engine check):
@@ -25,6 +27,17 @@ Build for production:
 npm run build
 ```
 
+## Usage
+
+1) Launch the app and acknowledge the disclaimer by clicking **Start Quiz**.
+2) Answer each question; radios for single-answer, checkboxes for multi-answer.
+3) Over-selecting multi-answer questions shows a warning; the last step allows finish even if
+   unanswered (counts incorrect).
+4) Scoring: +10 points per correct question, 70% of total points is the pass bar. Summary shows
+   points, percent, pass/fail, and correct count.
+5) Use **Review answers** anytime to inspect correct answers and explanations.
+
+## Data
 The quiz data lives in `public/GH300-questions.yaml` so it can be fetched at runtime. To replace the content, drop in a new YAML file with the same shape.
 
 Example shape:
