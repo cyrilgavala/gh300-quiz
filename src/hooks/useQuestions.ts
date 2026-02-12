@@ -1,12 +1,15 @@
-import { useEffect, useState } from 'react'
+import {useEffect, useState} from 'react'
 import YAML from 'yaml'
-import type { Question } from '../types'
+import type {QuestionAttributes} from '../types'
 
 const normalizeLetter = (letter: string) => letter.trim().toUpperCase()
-type RawQuestion = Omit<Question, 'correctAnswers'> & { correct_answer?: string[] }
+type RawQuestion = Omit<QuestionAttributes, 'correctAnswers'> & {
+  correct_answer?: string[];
+  correctAnswer?: string[]
+}
 
 export default function useQuestions() {
-  const [questions, setQuestions] = useState<Question[]>([])
+  const [questions, setQuestions] = useState<QuestionAttributes[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -22,10 +25,17 @@ export default function useQuestions() {
 
         const text = await response.text()
         const parsed = (YAML.parse(text) as RawQuestion[] | null) ?? []
-        const normalized: Question[] = parsed.map(({ correct_answer, ...rest }) => ({
-          ...rest,
-          correctAnswers: (correct_answer ?? []).map(normalizeLetter),
-        }))
+        const normalized: QuestionAttributes[] = parsed.map(({
+                                                               correct_answer,
+                                                               correctAnswer,
+                                                               ...rest
+                                                             }) => {
+          const answersRaw = correct_answer ?? correctAnswer ?? []
+          return {
+            ...rest,
+            correctAnswers: answersRaw.map(normalizeLetter),
+          }
+        })
 
         if (!cancelled) {
           setQuestions(normalized)

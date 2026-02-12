@@ -6,10 +6,16 @@ vi.mock('./hooks/useQuestions', () => {
   const questions = [
     {
       id: 1,
-      question: 'First question?',
-      answers: ['Yes', 'No'],
-      correctAnswers: ['A'],
-      explanation: 'Because yes'
+      question: 'How can you use GitHub Copilot to get inline suggestions for refactoring your code?',
+      answers: [
+        'By adding comments to your code and triggering a suggestion.',
+        "By highlighting the code you want to fix, right-clicking, and selecting 'Fix using GitHub Copilot.'",
+        'By running the gh copilot fix command.',
+        "By using the '/fix' command in GitHub Copilot in-line chat.",
+        "By highlighting the code you want to fix, right-clicking, and selecting 'Refactor using GitHub Copilot.'",
+      ],
+      correctAnswers: ['A', 'E'],
+      explanation: 'You can use comments or the refactor context menu for inline suggestions.'
     },
     {
       id: 2,
@@ -38,9 +44,11 @@ describe('App', () => {
     const user = userEvent.setup()
     render(<App />)
 
-    expect(screen.getByText('First question?')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', {name: /start quiz/i}))
+    expect(screen.getByText(/inline suggestions for refactoring/i)).toBeInTheDocument()
 
-    await user.click(screen.getByLabelText(/No/))
+    await user.click(screen.getByLabelText(/adding comments/i))
+    await user.click(screen.getByLabelText(/refactor using github copilot/i))
     await user.click(screen.getByRole('button', { name: /next/i }))
 
     expect(screen.getByText('Second question?')).toBeInTheDocument()
@@ -49,17 +57,19 @@ describe('App', () => {
     await user.click(screen.getByRole('button', { name: /finish/i }))
 
     expect(screen.getByText('Your score')).toBeInTheDocument()
-    expect(screen.getByText('1')).toBeInTheDocument()
-    expect(screen.getByText('out of')).toBeInTheDocument()
-    expect(screen.getByText('2')).toBeInTheDocument()
-    expect(screen.getByText('50%')).toBeInTheDocument()
+    expect(screen.getByText(/points of/i)).toBeInTheDocument()
+    expect(screen.getByText('100%')).toBeInTheDocument()
+    expect(screen.getByText(/Passed \(70% threshold\)/i)).toBeInTheDocument()
   })
 
   it('saves an attempt after finishing the quiz', async () => {
     const user = userEvent.setup()
     render(<App/>)
 
-    await user.click(screen.getByLabelText(/No/))
+    await user.click(screen.getByRole('button', {name: /start quiz/i}))
+
+    await user.click(screen.getByLabelText(/adding comments/i))
+    await user.click(screen.getByLabelText(/refactor using github copilot/i))
     await user.click(screen.getByRole('button', {name: /next/i}))
     await user.click(screen.getByLabelText(/Right/))
     await user.click(screen.getByRole('button', {name: /finish/i}))
@@ -68,8 +78,52 @@ describe('App', () => {
     expect(stored).toHaveLength(1)
     const attempt = stored[0]
     expect(attempt.attemptId).toBeTruthy()
-    expect(attempt.score.correct).toBe(1)
-    expect(attempt.score.total).toBe(2)
-    expect(attempt.score.percent).toBe(50)
+    expect(attempt.score.points).toBe(20)
+    expect(attempt.score.totalPoints).toBe(20)
+  })
+
+  it('shows a warning when selecting too many answers for a multi-select question', async () => {
+    const user = userEvent.setup()
+    render(<App/>)
+
+    await user.click(screen.getByRole('button', {name: /start quiz/i}))
+    await user.click(screen.getByLabelText(/adding comments/i))
+    await user.click(screen.getByLabelText(/fix using github copilot/i))
+    await user.click(screen.getByLabelText(/gh copilot fix command/i))
+
+    expect(screen.getByRole('alert')).toHaveTextContent('only 2 are correct')
+  })
+
+  it('resets selected answers for the current question', async () => {
+    const user = userEvent.setup()
+    render(<App/>)
+
+    await user.click(screen.getByRole('button', {name: /start quiz/i}))
+    const first = screen.getByLabelText(/adding comments/i)
+    const second = screen.getByLabelText(/refactor using github copilot/i)
+
+    await user.click(first)
+    await user.click(second)
+    expect((first as HTMLInputElement).checked).toBe(true)
+    expect((second as HTMLInputElement).checked).toBe(true)
+
+    await user.click(screen.getByRole('button', {name: /reset selection/i}))
+
+    expect((first as HTMLInputElement).checked).toBe(false)
+    expect((second as HTMLInputElement).checked).toBe(false)
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+
+  it('allows opening review from the quiz and returning back', async () => {
+    const user = userEvent.setup()
+    render(<App/>)
+
+    await user.click(screen.getByRole('button', {name: /start quiz/i}))
+    await user.click(screen.getByRole('button', {name: /review answers/i}))
+    expect(screen.getByText('Review')).toBeInTheDocument()
+    expect(screen.getByRole('button', {name: /back to quiz/i})).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', {name: /back to quiz/i}))
+    expect(screen.getByText(/inline suggestions for refactoring/i)).toBeInTheDocument()
   })
 })

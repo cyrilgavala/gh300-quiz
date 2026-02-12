@@ -1,4 +1,4 @@
-export interface Question {
+export type QuestionAttributes = {
   id: number
   question: string
   answers: string[]
@@ -6,14 +6,15 @@ export interface Question {
   explanation: string
 }
 
+export type Score = {
+  points: number,
+  totalPoints: number
+}
+
 export type Attempt = {
   attemptId: string
   startedAt: string
   completedAt: string
-  score: {
-    correct: number
-    total: number
-    percent: number
-  }
+  score: Score
   notes?: string
 }

@@ -2,8 +2,8 @@ import Card from './Card'
 import './Summary.css'
 
 type SummaryProps = {
-  correct: number
-  total: number
+  points: number
+  totalPoints: number
   onReview: () => void
   onRetake: () => void
 }
@@ -17,8 +17,8 @@ const summaryNote = (percent: number) => {
   return 'Try again. Use the explanations as a guide and a second attempt will feel much smoother.'
 }
 
-const Summary = ({correct, total, onReview, onRetake}: SummaryProps) => {
-  const percent = total === 0 ? 0 : Math.round((correct / total) * 100)
+const Summary = ({points, totalPoints, onReview, onRetake}: SummaryProps) => {
+  const percent = totalPoints ? Math.round((points / totalPoints) * 100) : 0
   const note = summaryNote(percent)
   return (
       <Card
@@ -32,13 +32,15 @@ const Summary = ({correct, total, onReview, onRetake}: SummaryProps) => {
           }
       >
         <div className="score">
-          <div className="score-number">{correct}</div>
+          <div className="score-number">{points}</div>
           <div className="score-details">
             <div>
-              <span className="label">out of</span>
-              <strong>{total}</strong>
+              <span className="label">points of</span>
+              <strong>{totalPoints}</strong>
             </div>
             <div className="percent">{percent}%</div>
+            <div
+                className="percent">{percent > 70 ? 'Passed (70% threshold)' : 'Not passed (70% threshold)'}</div>
             <div className="note">{note}</div>
           </div>
         </div>

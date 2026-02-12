@@ -21,6 +21,9 @@
   --color-error-bg: #fff1f2;
   --color-error-border: #fecdd3;
   --color-error-text: #b91c1c;
+  --color-warning-bg: #fffbeb;
+  --color-warning-border: #fcd34d;
+  --color-warning-text: #92400e;
   --color-border-strong: #cbd5e1;
   --color-muted-soft: #94a3b8;
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -96,6 +99,9 @@ ul {
     --color-error-bg: #3f1d2e;
     --color-error-border: #be123c;
     --color-error-text: #fecdd3;
+    --color-warning-bg: #422006;
+    --color-warning-border: #f59e0b;
+    --color-warning-text: #fef3c7;
     color-scheme: dark;
   }
 

@@ -1,17 +1,18 @@
 import Card from './Card'
 import './Review.css'
-import type { Question } from '../types'
+import type {QuestionAttributes} from '../types'
 
 const letterFromIndex = (index: number) => String.fromCharCode(65 + index)
 const normalizeLetter = (letter: string) => letter.trim().toUpperCase()
 
 type ReviewProps = {
-  questions: Question[]
+  questions: QuestionAttributes[]
   answers: Record<number, Set<string>>
   onBack: () => void
+  backLabel?: string
 }
 
-const Review = ({ questions, answers, onBack }: ReviewProps) => (
+const Review = ({questions, answers, onBack, backLabel = 'Back to summary'}: ReviewProps) => (
     <section className="review">
       <div className="review-header">
         <div>
@@ -20,13 +21,14 @@ const Review = ({ questions, answers, onBack }: ReviewProps) => (
           <p className="subtitle">Correct answers are highlighted, with your selections marked.</p>
         </div>
         <button className="secondary" onClick={onBack}>
-          Back to summary
+          {backLabel}
         </button>
       </div>
       <div className="review-grid">
         {questions.map((question, index) => {
           const correctSet = new Set(question.correctAnswers.map(normalizeLetter))
           const selectedSet = answers[question.id] ?? new Set<string>()
+          const hasSelection = selectedSet.size > 0
 
           return (
               <Card
@@ -38,7 +40,8 @@ const Review = ({ questions, answers, onBack }: ReviewProps) => (
                       <p className="eyebrow">Question {index + 1}</p>
                       <h3>{question.question}</h3>
                       {question.correctAnswers.length > 1 && (
-                          <div className="hint">Multiple answers were correct for this question.</div>
+                          <div className="hint">Multiple answers were correct for this
+                            question.</div>
                       )}
                     </>
                   }
@@ -52,8 +55,8 @@ const Review = ({ questions, answers, onBack }: ReviewProps) => (
                     return (
                         <li
                             key={letter}
-                            className={`answer review-item${isCorrect ? ' correct' : ''}${
-                                isSelected && !isCorrect ? ' selected-wrong' : ''
+                            className={`answer review-item${isCorrect && hasSelection ? ' correct' : ''}${
+                                (isSelected && !isCorrect) || (!hasSelection && isCorrect) ? ' selected-wrong' : ''
                             }${isSelected ? ' chosen' : ''}`}
                         >
                           <div className="answer-body">
@@ -61,16 +64,24 @@ const Review = ({ questions, answers, onBack }: ReviewProps) => (
                             <span>{answer}</span>
                           </div>
                           <div className="answer-flags">
-                            {isCorrect && <span className="badge success">Correct</span>}
-                            {isSelected && !isCorrect &&
-                                <span className="badge error">Your choice</span>}
-                            {isSelected && isCorrect &&
+                            {hasSelection && isCorrect &&
+                                <span className="badge success">Correct</span>}
+                            {hasSelection && isSelected && isCorrect &&
                                 <span className="badge neutral">You chose this</span>}
+                            {hasSelection && isSelected && !isCorrect &&
+                                <span className="badge error">Your choice</span>}
+
                           </div>
                         </li>
                     )
                   })}
                 </ul>
+                {!hasSelection && (
+                    <p className="explanation">
+                      <strong>Not answered:</strong> You skipped this question. Review the correct
+                      options above.
+                    </p>
+                )}
                 <p className="explanation">
                   <strong>Explanation:</strong> {question.explanation}
                 </p>
