@@ -14,19 +14,19 @@ vi.mock('./hooks/useQuestions', () => {
         "By using the '/fix' command in GitHub Copilot in-line chat.",
         "By highlighting the code you want to fix, right-clicking, and selecting 'Refactor using GitHub Copilot.'",
       ],
-      correctAnswers: ['A', 'E'],
-      explanation: 'You can use comments or the refactor context menu for inline suggestions.'
+      correctAnswer: ['A', 'E'],
+      explanation: 'You can use comments or the refactor context menu for inline suggestions.',
     },
     {
       id: 2,
       question: 'Second question?',
       answers: ['Left', 'Right', 'Up'],
-      correctAnswers: ['B'],
-      explanation: 'Right is correct'
-    }
+      correctAnswer: ['B'],
+      explanation: 'Right is correct',
+    },
   ]
   return {
-    default: () => ({ questions, loading: false, error: null }),
+    default: () => ({questions, loading: false, error: null}),
   }
 })
 
@@ -34,10 +34,6 @@ describe('App', () => {
   beforeAll(() => {
     // Prevent scroll errors in jsdom
     window.scrollTo = vi.fn()
-  })
-
-  beforeEach(() => {
-    localStorage.clear()
   })
 
   it('walks through the wizard and shows summary score', async () => {
@@ -49,37 +45,18 @@ describe('App', () => {
 
     await user.click(screen.getByLabelText(/adding comments/i))
     await user.click(screen.getByLabelText(/refactor using github copilot/i))
-    await user.click(screen.getByRole('button', { name: /next/i }))
+    await user.click(screen.getByRole('button', {name: /next/i}))
 
     expect(screen.getByText('Second question?')).toBeInTheDocument()
 
     await user.click(screen.getByLabelText(/Right/))
-    await user.click(screen.getByRole('button', { name: /finish/i }))
+    await user.click(screen.getByRole('button', {name: /finish/i}))
 
     expect(screen.getByText('Your score')).toBeInTheDocument()
+    expect(screen.getAllByText('20')).toHaveLength(2)
     expect(screen.getByText(/points of/i)).toBeInTheDocument()
     expect(screen.getByText('100%')).toBeInTheDocument()
     expect(screen.getByText(/Passed \(70% threshold\)/i)).toBeInTheDocument()
-  })
-
-  it('saves an attempt after finishing the quiz', async () => {
-    const user = userEvent.setup()
-    render(<App/>)
-
-    await user.click(screen.getByRole('button', {name: /start quiz/i}))
-
-    await user.click(screen.getByLabelText(/adding comments/i))
-    await user.click(screen.getByLabelText(/refactor using github copilot/i))
-    await user.click(screen.getByRole('button', {name: /next/i}))
-    await user.click(screen.getByLabelText(/Right/))
-    await user.click(screen.getByRole('button', {name: /finish/i}))
-
-    const stored = JSON.parse(localStorage.getItem('gh300-attempts') ?? '[]') as Array<any>
-    expect(stored).toHaveLength(1)
-    const attempt = stored[0]
-    expect(attempt.attemptId).toBeTruthy()
-    expect(attempt.score.points).toBe(20)
-    expect(attempt.score.totalPoints).toBe(20)
   })
 
   it('shows a warning when selecting too many answers for a multi-select question', async () => {

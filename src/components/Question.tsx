@@ -32,13 +32,12 @@ const Question = ({
                     canFinish,
                   }: QuestionProps) => {
   const progress = total ? ((index + 1) / total) * 100 : 0
-  const isMultiSelect = question.correctAnswers.length > 1
-  const correctCount = question.correctAnswers.length
+  const isMultiSelect = question.correctAnswer.length > 1
+  const correctCount = question.correctAnswer.length
   const isLast = index === total - 1
   const selected = selectedAnswers ?? new Set<string>()
   const inputType = isMultiSelect ? 'checkbox' : 'radio'
   const overLimit = isMultiSelect && selected.size > correctCount
-  const hasSelection = selected.size > 0
 
   return (
       <Card
@@ -120,13 +119,6 @@ const Question = ({
             )}
           </div>
         </div>
-
-        {isLast && !hasSelection && (
-            <div className="panel">
-              You have not selected an answer for this question. Finishing now will count it as
-              incorrect.
-            </div>
-        )}
       </Card>
   )
 }

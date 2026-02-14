@@ -1,11 +1,30 @@
 import Card from './Card'
 import './Summary.css'
+import type {QuestionAttributes} from "../types.ts";
 
 type SummaryProps = {
-  points: number
-  totalPoints: number
+  answers: Record<number, Set<string>>
+  questions: QuestionAttributes[]
   onReview: () => void
   onRetake: () => void
+}
+
+const setsEqual = (a: Set<string>, b: Set<string>) => a.size === b.size && [...a].every((value) => b.has(value))
+
+const calculateScore = (questions: QuestionAttributes[], answers: Record<number, Set<string>>) => {
+  const correct = questions.reduce((count, question) => {
+    const selected = answers[question.id]
+    if (!selected || selected.size === 0) return count
+    const correctSet = new Set(question.correctAnswer)
+    return setsEqual(selected, correctSet) ? count + 1 : count
+  }, 0)
+
+
+  const total = questions.length
+  const points = correct * 10
+  const totalPoints = total * 10
+
+  return {points, totalPoints}
 }
 
 const summaryNote = (percent: number) => {
@@ -17,7 +36,9 @@ const summaryNote = (percent: number) => {
   return 'Try again. Use the explanations as a guide and a second attempt will feel much smoother.'
 }
 
-const Summary = ({points, totalPoints, onReview, onRetake}: SummaryProps) => {
+const Summary = ({answers, questions, onReview, onRetake}: SummaryProps) => {
+  const {points, totalPoints} = calculateScore(questions, answers)
+
   const percent = totalPoints ? Math.round((points / totalPoints) * 100) : 0
   const note = summaryNote(percent)
   return (

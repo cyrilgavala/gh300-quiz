@@ -1,16 +1,13 @@
-import {useEffect, useMemo, useState} from 'react'
+import {useEffect, useState} from 'react'
 import './App.css'
 import useQuestions from './hooks/useQuestions'
 import Review from './components/Review'
 import Summary from './components/Summary'
-import {saveAttempt} from './storage/attempts'
-import type {Attempt, QuestionAttributes, Score} from './types'
+import type {QuestionAttributes} from './types'
 import Question from './components/Question'
 
 type ViewMode = 'quiz' | 'summary' | 'review' | 'disclaimer'
 
-const normalizeLetter = (letter: string) => letter.trim().toUpperCase()
-const setsEqual = (a: Set<string>, b: Set<string>) => a.size === b.size && [...a].every((value) => b.has(value))
 
 const App = () => {
   const {questions, loading, error} = useQuestions()
@@ -18,35 +15,18 @@ const App = () => {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [view, setView] = useState<ViewMode>('disclaimer')
   const [reviewReturnView, setReviewReturnView] = useState<ViewMode>('summary')
-  const [startedAt, setStartedAt] = useState(() => new Date().toISOString())
 
   const currentQuestion = questions[currentIndex]
 
-  const score: Score = useMemo(() => {
-    const correct = questions.reduce((count, question) => {
-      const selected = answers[question.id]
-      if (!selected || selected.size === 0) return count
-      const correctSet = new Set(question.correctAnswers.map(normalizeLetter))
-      return setsEqual(selected, correctSet) ? count + 1 : count
-    }, 0)
-
-    const total = questions.length
-    const points = correct * 10
-    const totalPoints = total * 10
-
-    return {points, totalPoints}
-  }, [answers, questions])
-
   const selectAnswer = (question: QuestionAttributes, letter: string) => {
-    const normalized = normalizeLetter(letter)
     setAnswers((prev) => {
       const next = {...prev}
-      if (question.correctAnswers.length > 1) {
+      if (question.correctAnswer.length > 1) {
         const current = new Set(next[question.id] ?? [])
-        current.has(normalized) ? current.delete(normalized) : current.add(normalized)
+        current.has(letter) ? current.delete(letter) : current.add(letter)
         next[question.id] = current
       } else {
-        next[question.id] = new Set([normalized])
+        next[question.id] = new Set([letter])
       }
       return next
     })
@@ -91,14 +71,6 @@ const App = () => {
   }, [goNext, goPrev, view])
 
   const finishQuiz = () => {
-    const attempt: Attempt = {
-      attemptId: (globalThis.crypto?.randomUUID?.() ?? Math.random().toString(36).slice(2)),
-      startedAt,
-      completedAt: new Date().toISOString(),
-      score: score,
-    }
-    saveAttempt(attempt)
-
     setView('summary')
     window.scrollTo({top: 0, behavior: 'smooth'})
   }
@@ -107,7 +79,6 @@ const App = () => {
     setAnswers({})
     setCurrentIndex(0)
     setView('quiz')
-    setStartedAt(new Date().toISOString())
     window.scrollTo({top: 0, behavior: 'smooth'})
   }
 
@@ -157,8 +128,8 @@ const App = () => {
 
         {!loading && !error && view === 'summary' && (
             <Summary
-                points={score.points}
-                totalPoints={score.totalPoints}
+                answers={answers}
+                questions={questions}
                 onReview={() => openReview('summary')}
                 onRetake={retakeQuiz}
             />

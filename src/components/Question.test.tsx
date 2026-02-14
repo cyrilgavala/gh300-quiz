@@ -7,7 +7,7 @@ const baseQuestion: QuestionAttributes = {
   id: 1,
   question: 'Sample question?',
   answers: ['First', 'Second', 'Third'],
-  correctAnswers: ['A'],
+  correctAnswer: ['A'],
   explanation: 'Because it is correct.'
 }
 
@@ -56,7 +56,7 @@ describe('Question', () => {
   it('shows multi-select hint, checkboxes, and over-limit warning with disabled finish', () => {
     const selected = new Set(['A', 'B', 'C'])
     renderQuestion({
-      question: {...baseQuestion, correctAnswers: ['A', 'B']},
+      question: {...baseQuestion, correctAnswer: ['A', 'B']},
       selectedAnswers: selected,
       total: 1,
       index: 0,
@@ -67,18 +67,6 @@ describe('Question', () => {
     expect(boxes).toHaveLength(3)
     expect(screen.getByRole('alert')).toHaveTextContent('only 2 are correct')
     expect(screen.getByRole('button', {name: /Finish/})).toBeDisabled()
-  })
-
-  it('shows skip notice on last question when nothing selected', () => {
-    renderQuestion({
-      index: 0,
-      total: 1,
-      selectedAnswers: new Set(),
-    })
-
-    expect(
-        screen.getByText('You have not selected an answer for this question. Finishing now will count it as incorrect.'),
-    ).toBeInTheDocument()
   })
 
   it('fires reset callback when clicking reset selection', async () => {

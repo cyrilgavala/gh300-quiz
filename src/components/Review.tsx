@@ -26,7 +26,7 @@ const Review = ({questions, answers, onBack, backLabel = 'Back to summary'}: Rev
       </div>
       <div className="review-grid">
         {questions.map((question, index) => {
-          const correctSet = new Set(question.correctAnswers.map(normalizeLetter))
+          const correctSet = new Set(question.correctAnswer.map(normalizeLetter))
           const selectedSet = answers[question.id] ?? new Set<string>()
           const hasSelection = selectedSet.size > 0
 
@@ -39,7 +39,7 @@ const Review = ({questions, answers, onBack, backLabel = 'Back to summary'}: Rev
                     <>
                       <p className="eyebrow">Question {index + 1}</p>
                       <h3>{question.question}</h3>
-                      {question.correctAnswers.length > 1 && (
+                      {question.correctAnswer.length > 1 && (
                           <div className="hint">Multiple answers were correct for this
                             question.</div>
                       )}

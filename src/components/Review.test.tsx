@@ -7,7 +7,7 @@ describe('Review', () => {
     id: 1,
     question: 'Select the correct options',
     answers: ['Answer A', 'Answer B', 'Answer C'],
-    correctAnswers: ['A', 'C'],
+    correctAnswer: ['A', 'C'],
     explanation: 'A and C are correct because...'
   }
 

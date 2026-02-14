@@ -38,7 +38,23 @@
   border-radius: 12px;
   padding: 10px 12px;
   background: var(--color-surface);
-  transition: border-color 0.15s ease, background 0.15s ease;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.answer:hover {
+  border-color: var(--color-primary);
+  background: var(--color-soft);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--color-primary) 15%, transparent);
+}
+
+.answer:active {
+  border-color: var(--color-primary-strong);
+  background: var(--color-neutral-bg);
+}
+
+.answer:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 25%, transparent);
 }
 
 .answer label {
@@ -67,4 +83,3 @@
   border-color: var(--color-neutral-border);
   background: var(--color-neutral-bg);
 }
-
