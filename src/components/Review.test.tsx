@@ -12,7 +12,7 @@ describe('Review', () => {
   }
 
   it('highlights correct and incorrect selections', () => {
-    const answers = { [question.id]: new Set(['A', 'B']) }
+    const answers = {[question.id]: new Set(['A', 'B'])}
     render(<Review questions={[question]} answers={answers} onBack={() => {
     }} backLabel="Back"/>)
 

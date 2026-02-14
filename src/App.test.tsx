@@ -1,6 +1,6 @@
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import App from './App'
+import App from './App.tsx'
 
 vi.mock('./hooks/useQuestions', () => {
   const questions = [
@@ -38,7 +38,7 @@ describe('App', () => {
 
   it('walks through the wizard and shows summary score', async () => {
     const user = userEvent.setup()
-    render(<App />)
+    render(<App/>)
 
     await user.click(screen.getByRole('button', {name: /start quiz/i}))
     expect(screen.getByText(/inline suggestions for refactoring/i)).toBeInTheDocument()

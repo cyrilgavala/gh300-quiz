@@ -17,6 +17,7 @@ const App = () => {
   const [reviewReturnView, setReviewReturnView] = useState<ViewMode>('summary')
 
   const currentQuestion = questions[currentIndex]
+  const ready = !loading && !error
 
   const selectAnswer = (question: QuestionAttributes, letter: string) => {
     setAnswers((prev) => {
@@ -49,6 +50,18 @@ const App = () => {
     setView('review')
   }
 
+  const finishQuiz = () => {
+    setView('summary')
+    window.scrollTo({top: 0, behavior: 'smooth'})
+  }
+
+  const retakeQuiz = () => {
+    setAnswers({})
+    setCurrentIndex(0)
+    setView('quiz')
+    window.scrollTo({top: 0, behavior: 'smooth'})
+  }
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (view !== 'quiz') return
@@ -70,18 +83,6 @@ const App = () => {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [goNext, goPrev, view])
 
-  const finishQuiz = () => {
-    setView('summary')
-    window.scrollTo({top: 0, behavior: 'smooth'})
-  }
-
-  const retakeQuiz = () => {
-    setAnswers({})
-    setCurrentIndex(0)
-    setView('quiz')
-    window.scrollTo({top: 0, behavior: 'smooth'})
-  }
-
   return (
       <div className="app-shell">
         <header className="page-header">
@@ -91,15 +92,13 @@ const App = () => {
           </div>
         </header>
 
-        {!loading && !error && view === 'disclaimer' && (
+        {ready && view === 'disclaimer' && (
             <div className="panel disclaimer">
               <h3>Disclaimer</h3>
               <p>
                 All questions are web-scraped from publicly available sources and are provided
-                solely for
-                personal use to prepare for and evaluate knowledge for the GH300 GitHub Copilot
-                certification. All
-                rights and copyrights belong to Microsoft and GitHub.
+                solely for personal use to prepare for and evaluate knowledge for the GH300 GitHub
+                Copilot certification. All rights and copyrights belong to Microsoft and GitHub.
               </p>
               <button onClick={() => setView('quiz')}>Start Quiz</button>
             </div>
@@ -107,10 +106,9 @@ const App = () => {
 
         {loading && <div className="panel">Loading questions…</div>}
         {error && <div className="panel error">Failed to load questions: {error}</div>}
-        {!loading && !error && questions.length === 0 &&
-            <div className="panel">No questions available.</div>}
+        {ready && questions.length === 0 && <div className="panel">No questions available.</div>}
 
-        {!loading && !error && currentQuestion && view === 'quiz' && (
+        {ready && currentQuestion && view === 'quiz' && (
             <Question
                 question={currentQuestion}
                 index={currentIndex}
@@ -126,7 +124,7 @@ const App = () => {
             />
         )}
 
-        {!loading && !error && view === 'summary' && (
+        {ready && view === 'summary' && (
             <Summary
                 answers={answers}
                 questions={questions}
@@ -135,7 +133,7 @@ const App = () => {
             />
         )}
 
-        {!loading && !error && view === 'review' && (
+        {ready && view === 'review' && (
             <Review
                 questions={questions}
                 answers={answers}

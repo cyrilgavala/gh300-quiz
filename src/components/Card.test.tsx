@@ -1,14 +1,14 @@
-import { render, screen } from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
 import Card from './Card'
-import type { ReactNode } from 'react'
+import type {ReactNode} from 'react'
 
 describe('Card', () => {
   const renderCard = (header?: ReactNode) =>
-    render(
-      <Card header={header} data-testid="card">
-        <div>Body content</div>
-      </Card>,
-    )
+      render(
+          <Card header={header} data-testid="card">
+            <div>Body content</div>
+          </Card>,
+      )
 
   it('renders header and children', () => {
     renderCard(<h3>Header text</h3>)
